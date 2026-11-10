@@ -1,0 +1,59 @@
+{
+  "name": "@sudobility/resources_client",
+  "version": "0.0.1",
+  "description": "Cross-platform (web + React Native) client for the Sudobility resources catalog over an injected NetworkClient",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "CLAUDE.md"
+  ],
+  "scripts": {
+    "build": "bunx tsc -p tsconfig.build.json && node scripts/fix-esm-imports.mjs",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "typecheck": "bunx tsc --noEmit",
+    "lint": "bunx eslint src",
+    "lint:fix": "bunx eslint src --fix",
+    "format": "bunx prettier --write \"src/**/*.{ts,tsx,js,jsx,json}\"",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "verify": "bun run typecheck && bun run lint && bun run test:unit && bun run build",
+    "prepublishOnly": "bun run build"
+  },
+  "peerDependencies": {
+    "@sudobility/types": "^1.9.79",
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "~10.0.1",
+    "@sudobility/types": "^1.9.79",
+    "@types/bun": "~1.4.4",
+    "@types/node": "~26.6.5",
+    "@types/react": "~19.3.0",
+    "@typescript-eslint/eslint-plugin": "~8.72.0",
+    "@typescript-eslint/parser": "~8.72.0",
+    "eslint": "~10.13.0",
+    "eslint-config-prettier": "~10.1.8",
+    "eslint-plugin-prettier": "~5.5.7",
+    "prettier": "~3.9.10",
+    "typescript": "~6.0.3",
+    "vitest": "~4.1.12"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "BUSL-1.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sudobility/resources_client.git"
+  }
+}
