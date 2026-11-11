@@ -7,11 +7,14 @@
  * catalog is public per (app, language).
  */
 import type { ResourcesApiClient } from "../network/ResourcesApiClient.js";
-import type { ResourceSection } from "../types/index.js";
+import type { ResourceSectionWithResources } from "../types/index.js";
 
 export class ResourcesService {
-  private readonly cache = new Map<string, ResourceSection[]>();
-  private readonly inFlight = new Map<string, Promise<ResourceSection[]>>();
+  private readonly cache = new Map<string, ResourceSectionWithResources[]>();
+  private readonly inFlight = new Map<
+    string,
+    Promise<ResourceSectionWithResources[]>
+  >();
 
   constructor(private readonly client: ResourcesApiClient) {}
 
@@ -20,7 +23,7 @@ export class ResourcesService {
   }
 
   /** Cached section tree for a language. Shares an in-flight request. */
-  async data(lang: string): Promise<ResourceSection[]> {
+  async data(lang: string): Promise<ResourceSectionWithResources[]> {
     const key = this.key(lang);
     const cached = this.cache.get(key);
     if (cached) return cached;

@@ -10,7 +10,7 @@ import type { NetworkClient } from "@sudobility/types";
 import type {
   ResourceDataResponse,
   ResourcesApiClientConfig,
-  ResourceSection,
+  ResourceSectionWithResources,
 } from "../types/index.js";
 
 export class ResourcesApiClient {
@@ -42,7 +42,7 @@ export class ResourcesApiClient {
   }
 
   /** Fetch the section→resources tree for `lang` (en fallback is applied upstream). */
-  async data(lang: string): Promise<ResourceSection[]> {
+  async data(lang: string): Promise<ResourceSectionWithResources[]> {
     const response = await this.networkClient.get<ResourceDataResponse>(
       this.buildUrl(lang),
       { headers: await this.headers() },

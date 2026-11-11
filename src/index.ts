@@ -10,6 +10,7 @@ export { ResourcesApiClient } from "./network/ResourcesApiClient.js";
 export type {
   Resource,
   ResourceSection,
+  ResourceSectionWithResources,
   ResourceDataResponse,
   ResourcesApiClientConfig,
 } from "./types/index.js";

@@ -26,8 +26,10 @@ and RN from one build — never add a `fetch`/`axios`/`react-native` import.
 
 ## Conventions
 
-- **DTOs are redeclared here**, not imported from `resources_service` — the
-  frontend never depends on a backend package.
+- **DTOs come from `@sudobility/types`** (the one source shared with the
+  backend) and are re-exported from `types/index.ts`; the frontend never depends
+  on a backend package. `/data` returns `ResourceSectionWithResources[]`. Only
+  `ResourcesApiClientConfig` is defined locally.
 - The catalog is **public per (app, locale)**; there is no user/auth state. An
   optional `getAuthToken` exists only for apps that gate their own API.
 - camelCase on the wire; the central API already maps from its snake_case

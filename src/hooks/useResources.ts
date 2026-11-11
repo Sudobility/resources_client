@@ -8,17 +8,17 @@
  */
 import { useCallback, useEffect, useState } from "react";
 import { getResourcesService } from "../core/singleton.js";
-import type { ResourceSection } from "../types/index.js";
+import type { ResourceSectionWithResources } from "../types/index.js";
 
 export interface UseResourcesResult {
-  sections: ResourceSection[];
+  sections: ResourceSectionWithResources[];
   isLoading: boolean;
   error: Error | null;
   refetch: () => void;
 }
 
 export function useResources(lang: string): UseResourcesResult {
-  const [sections, setSections] = useState<ResourceSection[]>([]);
+  const [sections, setSections] = useState<ResourceSectionWithResources[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const [nonce, setNonce] = useState<number>(0);

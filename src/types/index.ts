@@ -1,39 +1,21 @@
 /**
  * Client-side view of the resources catalog (the sectioned aggregate).
  *
- * The shape is the JSON the app APIs serve at `GET /api/v1/resources/data`
- * (forwarded from the central sudobility_api's `/resources/{app}/{lang}/data`):
- * a list of sections, each with its enabled resources. Redeclared here — not
- * imported from the backend `resources_service` — so the frontend never depends
- * on a backend package.
+ * The wire DTOs live in `@sudobility/types` — the one source shared with the
+ * backend (`resources_service`, `sudobility_api`). They are re-exported here so
+ * app code and the UI packages import them from the client they already depend
+ * on. The `/data` aggregate each app serves is a list of
+ * {@link ResourceSectionWithResources}. Only the client-construction config is
+ * defined locally.
  */
+import type { NetworkClient } from "@sudobility/types";
 
-/** A tile under a section. */
-export interface Resource {
-  id: string;
-  title: string;
-  text: string;
-  iconUrl: string;
-  url: string;
-  sortOrder: number;
-  enabled: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-/** A section with its resources, as served by `/data`. */
-export interface ResourceSection {
-  id: string;
-  title: string;
-  sortOrder: number;
-  createdAt: string;
-  updatedAt: string;
-  resources: Resource[];
-}
-
-export interface ResourceDataResponse {
-  sections: ResourceSection[];
-}
+export type {
+  Resource,
+  ResourceSection,
+  ResourceSectionWithResources,
+  ResourceDataResponse,
+} from "@sudobility/types";
 
 /** Construction config for {@link ResourcesApiClient}. */
 export interface ResourcesApiClientConfig {
@@ -41,7 +23,7 @@ export interface ResourcesApiClientConfig {
    *  e.g. "https://api.music.app/api/v1". */
   baseUrl: string;
   /** Platform HTTP client, injected from `@sudobility/types`. */
-  networkClient: import("@sudobility/types").NetworkClient;
+  networkClient: NetworkClient;
   /** Path of the app's aggregate read endpoint (default "/resources/data"). */
   path?: string;
   /** Optional bearer token provider, attached as `Authorization` when present. */
