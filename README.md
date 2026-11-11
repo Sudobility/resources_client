@@ -24,17 +24,20 @@ import {
   shortenDomain,
 } from "@sudobility/resources_client";
 
-// At app startup, with your platform's NetworkClient:
+// At app startup, with your platform's NetworkClient. baseUrl includes /api/v1:
 const apiClient = new ResourcesApiClient({
-  baseUrl: "https://api.myapp.com", // the app's OWN api
+  baseUrl: "https://api.myapp.com/api/v1", // the app's OWN api
   networkClient,
   // optional: getAuthToken: () => session.token,
 });
 initializeResources({ apiClient });
 
-// In a component:
-const { resources, isLoading, error, refetch } = useResources(locale);
-resources.forEach((r) => console.log(r.title, shortenDomain(r.url)));
+// In a component (one network call fetches the whole tree):
+const { sections, isLoading, error, refetch } = useResources(locale);
+sections.forEach((s) => {
+  console.log(s.title);
+  s.resources.forEach((r) => console.log(" ", r.title, shortenDomain(r.url)));
+});
 ```
 
 The UI lives in `@sudobility/resources_pages` (web) and
@@ -42,11 +45,11 @@ The UI lives in `@sudobility/resources_pages` (web) and
 
 ## Exports
 
-- `ResourcesApiClient` — the HTTP client (read-only `list(locale?)`).
+- `ResourcesApiClient` — the HTTP client (read-only `data(lang)` → sections).
 - `initializeResources` / `getResourcesService` / `refreshResources` / `resetResources` — the module singleton.
-- `useResources(locale?)` — `{ resources, isLoading, error, refetch }`.
+- `useResources(lang)` — `{ sections, isLoading, error, refetch }`.
 - `shortenDomain(url)` — the small per-tile domain label.
-- Types: `Resource`, `ResourceListResponse`, `ResourcesApiClientConfig`.
+- Types: `Resource`, `ResourceSection`, `ResourceDataResponse`, `ResourcesApiClientConfig`.
 
 ## Scripts
 

@@ -2,14 +2,15 @@
  * @sudobility/resources_client
  *
  * Cross-platform (web + React Native) client for the Sudobility resources
- * catalog. Business logic only — no UI, no platform SDK. The one seam is the
- * injected `@sudobility/types` NetworkClient, which makes it run identically on
- * both renderers.
+ * catalog — the sectioned aggregate each app's page reads in one call. Business
+ * logic only; no UI, no platform SDK. The one seam is the injected
+ * `@sudobility/types` NetworkClient.
  */
 export { ResourcesApiClient } from "./network/ResourcesApiClient.js";
 export type {
   Resource,
-  ResourceListResponse,
+  ResourceSection,
+  ResourceDataResponse,
   ResourcesApiClientConfig,
 } from "./types/index.js";
 export {

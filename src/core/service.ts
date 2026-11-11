@@ -1,27 +1,27 @@
 /**
  * ResourcesService — a thin read-through cache over a `ResourcesApiClient`.
  *
- * The catalog is small and changes rarely, so each locale's list is fetched
- * once and memoized; concurrent callers for the same locale share one in-flight
- * request. `refresh()` drops the cache. There is no user/auth state here — the
- * catalog is public per (app, locale).
+ * The catalog is small and changes rarely, so each language's section tree is
+ * fetched once and memoized; concurrent callers for the same language share one
+ * in-flight request. `refresh()` drops the cache. No user/auth state — the
+ * catalog is public per (app, language).
  */
 import type { ResourcesApiClient } from "../network/ResourcesApiClient.js";
-import type { Resource } from "../types/index.js";
+import type { ResourceSection } from "../types/index.js";
 
 export class ResourcesService {
-  private readonly cache = new Map<string, Resource[]>();
-  private readonly inFlight = new Map<string, Promise<Resource[]>>();
+  private readonly cache = new Map<string, ResourceSection[]>();
+  private readonly inFlight = new Map<string, Promise<ResourceSection[]>>();
 
   constructor(private readonly client: ResourcesApiClient) {}
 
-  private key(locale?: string): string {
-    return locale ?? "__default__";
+  private key(lang: string): string {
+    return lang || "__default__";
   }
 
-  /** Cached list for a locale. Shares an in-flight request across callers. */
-  async list(locale?: string): Promise<Resource[]> {
-    const key = this.key(locale);
+  /** Cached section tree for a language. Shares an in-flight request. */
+  async data(lang: string): Promise<ResourceSection[]> {
+    const key = this.key(lang);
     const cached = this.cache.get(key);
     if (cached) return cached;
 
@@ -29,11 +29,11 @@ export class ResourcesService {
     if (existing) return existing;
 
     const promise = this.client
-      .list(locale)
-      .then((resources) => {
-        this.cache.set(key, resources);
+      .data(lang)
+      .then((sections) => {
+        this.cache.set(key, sections);
         this.inFlight.delete(key);
-        return resources;
+        return sections;
       })
       .catch((err) => {
         this.inFlight.delete(key);
@@ -43,14 +43,14 @@ export class ResourcesService {
     return promise;
   }
 
-  /** Drop cached data (all locales, or one) so the next read refetches. */
-  refresh(locale?: string): void {
-    if (locale === undefined) {
+  /** Drop cached data (all languages, or one) so the next read refetches. */
+  refresh(lang?: string): void {
+    if (lang === undefined) {
       this.cache.clear();
       this.inFlight.clear();
     } else {
-      this.cache.delete(this.key(locale));
-      this.inFlight.delete(this.key(locale));
+      this.cache.delete(this.key(lang));
+      this.inFlight.delete(this.key(lang));
     }
   }
 }

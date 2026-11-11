@@ -1,31 +1,32 @@
 /**
- * useResources — load the catalog for a locale from the configured singleton.
+ * useResources — load the catalog's section tree for a language from the
+ * configured singleton.
  *
- * Returns `{ resources, isLoading, error, refetch }`. Works identically on web
+ * Returns `{ sections, isLoading, error, refetch }`. Works identically on web
  * and React Native (only `react` is imported). A host that did not call
  * `initializeResources` gets a clear error state rather than a throw.
  */
 import { useCallback, useEffect, useState } from "react";
 import { getResourcesService } from "../core/singleton.js";
-import type { Resource } from "../types/index.js";
+import type { ResourceSection } from "../types/index.js";
 
 export interface UseResourcesResult {
-  resources: Resource[];
+  sections: ResourceSection[];
   isLoading: boolean;
   error: Error | null;
   refetch: () => void;
 }
 
-export function useResources(locale?: string): UseResourcesResult {
-  const [resources, setResources] = useState<Resource[]>([]);
+export function useResources(lang: string): UseResourcesResult {
+  const [sections, setSections] = useState<ResourceSection[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const [nonce, setNonce] = useState<number>(0);
 
   const refetch = useCallback(() => {
-    getResourcesService()?.refresh(locale);
+    getResourcesService()?.refresh(lang);
     setNonce((n) => n + 1);
-  }, [locale]);
+  }, [lang]);
 
   useEffect(() => {
     let active = true;
@@ -42,10 +43,10 @@ export function useResources(locale?: string): UseResourcesResult {
     setIsLoading(true);
     setError(null);
     service
-      .list(locale)
+      .data(lang)
       .then((list) => {
         if (!active) return;
-        setResources(list);
+        setSections(list);
         setIsLoading(false);
       })
       .catch((err: unknown) => {
@@ -56,7 +57,7 @@ export function useResources(locale?: string): UseResourcesResult {
     return () => {
       active = false;
     };
-  }, [locale, nonce]);
+  }, [lang, nonce]);
 
-  return { resources, isLoading, error, refetch };
+  return { sections, isLoading, error, refetch };
 }

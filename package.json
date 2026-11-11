@@ -1,6 +1,6 @@
 {
   "name": "@sudobility/resources_client",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Cross-platform (web + React Native) client for the Sudobility resources catalog over an injected NetworkClient",
   "type": "module",
   "main": "./dist/index.js",

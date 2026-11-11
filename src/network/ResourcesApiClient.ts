@@ -1,15 +1,16 @@
 /**
  * HTTP client for the resources catalog, over an injected `NetworkClient`.
  *
- * It talks to the *host app's own* API (which forwards to the central
- * sudobility_api) — never to the central API directly — so there is no API key
- * here. Reads only; the catalog is curated through the admin MCP, not the app.
+ * It talks to the *host app's own* API aggregate endpoint
+ * (`GET /api/v1/resources/data?lang=`), which forwards to the central
+ * sudobility_api — never to the central API directly, and never with an API
+ * key (reads are public; the catalog is curated through the admin MCP).
  */
 import type { NetworkClient } from "@sudobility/types";
 import type {
-  Resource,
-  ResourceListResponse,
+  ResourceDataResponse,
   ResourcesApiClientConfig,
+  ResourceSection,
 } from "../types/index.js";
 
 export class ResourcesApiClient {
@@ -21,15 +22,13 @@ export class ResourcesApiClient {
   constructor(config: ResourcesApiClientConfig) {
     this.baseUrl = config.baseUrl.replace(/\/+$/, "");
     this.networkClient = config.networkClient;
-    this.path = config.path ?? "/resources";
+    this.path = config.path ?? "/resources/data";
     this.getAuthToken = config.getAuthToken;
   }
 
-  private buildUrl(locale?: string): string {
+  private buildUrl(lang: string): string {
     const url = new URL(`${this.baseUrl}${this.path}`);
-    if (locale) url.searchParams.set("locale", locale);
-    // `new URL` leaves no trailing slash on the path, which some RN URL
-    // polyfills would otherwise add — the server routes the un-slashed form.
+    url.searchParams.set("lang", lang);
     return url.toString();
   }
 
@@ -42,10 +41,10 @@ export class ResourcesApiClient {
     return headers;
   }
 
-  /** Fetch the enabled resources for `locale` (or the app default). */
-  async list(locale?: string): Promise<Resource[]> {
-    const response = await this.networkClient.get<ResourceListResponse>(
-      this.buildUrl(locale),
+  /** Fetch the section→resources tree for `lang` (en fallback is applied upstream). */
+  async data(lang: string): Promise<ResourceSection[]> {
+    const response = await this.networkClient.get<ResourceDataResponse>(
+      this.buildUrl(lang),
       { headers: await this.headers() },
     );
     if (!response.ok) {
@@ -54,7 +53,7 @@ export class ResourcesApiClient {
           `Failed to load resources: ${response.status} ${response.statusText}`,
       );
     }
-    const resources = response.data?.resources;
-    return Array.isArray(resources) ? resources : [];
+    const sections = response.data?.sections;
+    return Array.isArray(sections) ? sections : [];
   }
 }
